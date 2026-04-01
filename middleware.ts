@@ -65,7 +65,9 @@ export async function middleware(request: NextRequest) {
     }
 
     if (isDashboardRoute) {
-      if (!profile || profile.subscription_status !== 'active') {
+      // Allow access if user just completed Stripe checkout (webhook may still be processing)
+      const justSubscribed = request.nextUrl.searchParams.get('subscribed') === 'true'
+      if (!justSubscribed && (!profile || profile.subscription_status !== 'active')) {
         const url = request.nextUrl.clone()
         url.pathname = '/subscribe'
         return NextResponse.redirect(url)

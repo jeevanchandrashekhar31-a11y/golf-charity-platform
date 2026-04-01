@@ -1,4 +1,4 @@
-﻿import { NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { getCurrentUser } from '@/lib/auth';
 import { createServerClient } from '@/lib/supabase';
 import { stripe, PLANS } from '@/lib/stripe';
@@ -64,6 +64,12 @@ export async function POST(req: Request) {
       metadata: { 
         userId: user.id, 
         plan 
+      },
+      subscription_data: {
+        metadata: {
+          userId: user.id,
+          plan,
+        },
       },
     });
 

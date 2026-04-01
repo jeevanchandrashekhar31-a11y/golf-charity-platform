@@ -116,6 +116,24 @@ export async function POST(req: Request) {
         }
         break;
       }
+
+      case 'checkout.session.completed': {
+        const session = event.data.object as any;
+        const userId = session.metadata?.userId;
+        const plan = session.metadata?.plan;
+
+        if (userId && session.subscription) {
+          await supabase
+            .from('profiles')
+            .update({
+              subscription_status: 'active',
+              subscription_plan: plan || null,
+              stripe_subscription_id: session.subscription as string,
+            })
+            .eq('id', userId);
+        }
+        break;
+      }
     }
 
     return NextResponse.json({ received: true }, { status: 200 });
